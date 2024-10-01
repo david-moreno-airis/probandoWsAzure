@@ -1,22 +1,17 @@
-// Importa el módulo http
-const http = require('http');
+const WebSocket = require('ws');
+const server = new WebSocket.Server({ port: process.env.PORT || 8080 });
 
-// Configura el puerto en el que el servidor escuchará
-const PORT = 3000;
+server.on('connection', (socket) => {
+    console.log('Nueva conexión de cliente');
 
-// Crea el servidor
-const server = http.createServer((req, res) => {
-    // Establece el encabezado de la respuesta
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    
-    // Escribe un mensaje en la respuesta
-    res.write('Hola, mundo');
-    
-    // Finaliza la respuesta
-    res.end();
+    socket.on('message', (message) => {
+        console.log('Mensaje recibido:', message);
+        socket.send(`Mensaje recibido: ${message}`);
+    });
+
+    socket.on('close', () => {
+        console.log('Cliente desconectado');
+    });
 });
 
-// El servidor comienza a escuchar en el puerto especificado
-server.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
-});
+console.log(`Servidor WebSocket corriendo en el puerto ${process.env.PORT || 8080}`);
